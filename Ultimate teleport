@@ -1,0 +1,76 @@
+-- Create GUI elements
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local InnerFrame = Instance.new("Frame")
+local TeleportButton = Instance.new("TextButton")
+local OpenButton = Instance.new("TextButton")
+local UICorner1 = Instance.new("UICorner")
+local UICorner2 = Instance.new("UICorner")
+local UICorner3 = Instance.new("UICorner")
+
+-- Parent GUI to PlayerGui
+ScreenGui.Name = "TeleportGUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Main Frame
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 250, 0, 150)
+MainFrame.Position = UDim2.new(0.5, -125, 0.5, -75)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.Visible = false
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+UICorner1.Parent = MainFrame
+
+-- Inner Frame
+InnerFrame.Name = "InnerFrame"
+InnerFrame.Size = UDim2.new(1, -20, 1, -20)
+InnerFrame.Position = UDim2.new(0, 10, 0, 10)
+InnerFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+InnerFrame.Parent = MainFrame
+UICorner2.Parent = InnerFrame
+
+-- Teleport Button
+TeleportButton.Name = "TeleportButton"
+TeleportButton.Size = UDim2.new(0.8, 0, 0, 40)
+TeleportButton.Position = UDim2.new(0.1, 0, 0.5, -20)
+TeleportButton.Text = "Teleport"
+TeleportButton.BackgroundColor3 = Color3.fromRGB(100, 100, 255)
+TeleportButton.TextColor3 = Color3.new(1, 1, 1)
+TeleportButton.Font = Enum.Font.GothamBold
+TeleportButton.TextSize = 16
+TeleportButton.Parent = InnerFrame
+UICorner3.Parent = TeleportButton
+
+-- Open Button
+OpenButton.Name = "OpenButton"
+OpenButton.Size = UDim2.new(0, 100, 0, 30)
+OpenButton.Position = UDim2.new(0, 10, 0, 10)
+OpenButton.Text = "Open"
+OpenButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+OpenButton.TextColor3 = Color3.new(1, 1, 1)
+OpenButton.Font = Enum.Font.GothamBold
+OpenButton.TextSize = 14
+OpenButton.Parent = ScreenGui
+OpenButton.Active = true
+OpenButton.Draggable = true
+
+-- Open/Close Logic
+OpenButton.MouseButton1Click:Connect(function()
+	MainFrame.Visible = not MainFrame.Visible
+	OpenButton.Text = MainFrame.Visible and "Close" or "Open"
+end)
+
+-- Teleport Logic
+TeleportButton.MouseButton1Click:Connect(function()
+	local player = game.Players.LocalPlayer
+	local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+	if rootPart then
+		local target = workspace:WaitForChild("Map"):WaitForChild("Structural"):WaitForChild("Terrain"):GetChildren()[8]
+		if target and target:IsA("BasePart") then
+			rootPart.CFrame = target.CFrame
+		end
+	end
+end)
