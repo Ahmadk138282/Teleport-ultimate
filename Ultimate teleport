@@ -1,51 +1,66 @@
--- Create GUI elements
+-- Create GUI
 local ScreenGui = Instance.new("ScreenGui")
-local MainFrame = Instance.new("Frame")
-local InnerFrame = Instance.new("Frame")
-local TeleportButton = Instance.new("TextButton")
-local OpenButton = Instance.new("TextButton")
-local UICorner1 = Instance.new("UICorner")
-local UICorner2 = Instance.new("UICorner")
-local UICorner3 = Instance.new("UICorner")
-
--- Parent GUI to PlayerGui
 ScreenGui.Name = "TeleportGUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 -- Main Frame
-MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 250, 0, 150)
-MainFrame.Position = UDim2.new(0.5, -125, 0.5, -75)
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 300, 0, 200)
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 MainFrame.Visible = false
 MainFrame.Active = true
 MainFrame.Draggable = true
 MainFrame.Parent = ScreenGui
-UICorner1.Parent = MainFrame
+Instance.new("UICorner", MainFrame)
 
 -- Inner Frame
-InnerFrame.Name = "InnerFrame"
+local InnerFrame = Instance.new("Frame")
 InnerFrame.Size = UDim2.new(1, -20, 1, -20)
 InnerFrame.Position = UDim2.new(0, 10, 0, 10)
 InnerFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 InnerFrame.Parent = MainFrame
-UICorner2.Parent = InnerFrame
+Instance.new("UICorner", InnerFrame)
 
 -- Teleport Button
-TeleportButton.Name = "TeleportButton"
+local TeleportButton = Instance.new("TextButton")
 TeleportButton.Size = UDim2.new(0.8, 0, 0, 40)
-TeleportButton.Position = UDim2.new(0.1, 0, 0.5, -20)
-TeleportButton.Text = "Teleport"
+TeleportButton.Position = UDim2.new(0.1, 0, 0.2, 0)
+TeleportButton.Text = "Teleport to Part"
 TeleportButton.BackgroundColor3 = Color3.fromRGB(100, 100, 255)
 TeleportButton.TextColor3 = Color3.new(1, 1, 1)
 TeleportButton.Font = Enum.Font.GothamBold
 TeleportButton.TextSize = 16
 TeleportButton.Parent = InnerFrame
-UICorner3.Parent = TeleportButton
+Instance.new("UICorner", TeleportButton)
 
--- Open Button
-OpenButton.Name = "OpenButton"
+-- TextBox for player name
+local PlayerBox = Instance.new("TextBox")
+PlayerBox.Size = UDim2.new(0.8, 0, 0, 35)
+PlayerBox.Position = UDim2.new(0.1, 0, 0.5, 0)
+PlayerBox.PlaceholderText = "Enter player name..."
+PlayerBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+PlayerBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+PlayerBox.Font = Enum.Font.Gotham
+PlayerBox.TextSize = 14
+PlayerBox.Parent = InnerFrame
+Instance.new("UICorner", PlayerBox)
+
+-- GoTo Button
+local GotoButton = Instance.new("TextButton")
+GotoButton.Size = UDim2.new(0.8, 0, 0, 35)
+GotoButton.Position = UDim2.new(0.1, 0, 0.7, 0)
+GotoButton.Text = "GoTo Player"
+GotoButton.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+GotoButton.TextColor3 = Color3.new(1, 1, 1)
+GotoButton.Font = Enum.Font.GothamBold
+GotoButton.TextSize = 16
+GotoButton.Parent = InnerFrame
+Instance.new("UICorner", GotoButton)
+
+-- Open/Close Button
+local OpenButton = Instance.new("TextButton")
 OpenButton.Size = UDim2.new(0, 100, 0, 30)
 OpenButton.Position = UDim2.new(0, 10, 0, 10)
 OpenButton.Text = "Open"
@@ -63,14 +78,33 @@ OpenButton.MouseButton1Click:Connect(function()
 	OpenButton.Text = MainFrame.Visible and "Close" or "Open"
 end)
 
--- Teleport Logic
+-- Teleport to Part
 TeleportButton.MouseButton1Click:Connect(function()
 	local player = game.Players.LocalPlayer
 	local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 	if rootPart then
-		local target = workspace:WaitForChild("Map"):WaitForChild("Structural"):WaitForChild("Terrain"):GetChildren()[8]
+		local target = workspace:WaitForChild("Map"):WaitForChild("Structural"):WaitForChild("Part"):GetChildren()[147]
 		if target and target:IsA("BasePart") then
 			rootPart.CFrame = target.CFrame
+		end
+	end
+end)
+
+-- GoTo Player by partial name
+GotoButton.MouseButton1Click:Connect(function()
+	local partialName = PlayerBox.Text:lower()
+	local localPlayer = game.Players.LocalPlayer
+	local rootPart = localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+	if partialName ~= "" and rootPart then
+		for _, player in ipairs(game.Players:GetPlayers()) do
+			if player ~= localPlayer and player.Name:lower():sub(1, #partialName) == partialName then
+				local targetRoot = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+				if targetRoot then
+					rootPart.CFrame = targetRoot.CFrame + Vector3.new(0, 3, 0) -- Teleport above the target
+					break
+				end
+			end
 		end
 	end
 end)
